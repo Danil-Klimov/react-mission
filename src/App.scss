@@ -1,0 +1,75 @@
+// main style
+*, :after, :before {
+  box-sizing: inherit
+}
+html {
+  box-sizing: border-box
+}
+body {
+  margin: 0;
+  padding: 0;
+}
+
+//table
+.table-container {
+  display: inline-block;
+  position: relative;
+  margin: 60px;
+  width: max-content;
+  --main-color: #48aae6;
+  --add-button-color: #f3a500;
+  --add-button-hover-color: #f6c052;
+  --del-button-color: #b20000;
+  --del-button-hover-color: #ca4c49;
+  --cell-spacing: 2px;
+  --border-width: 1px;
+}
+.table {
+  border: var(--border-width) solid var(--main-color);
+  td {
+    background-color: var(--main-color);
+  }
+}
+
+
+// buttons
+.table__button {
+  border: none;
+  color: #fff;
+  padding: 0;
+  transition: all 0.3s linear;
+  position: absolute;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.table__button_add {
+  background-color: var(--add-button-color);
+  &:hover {
+    background-color: var(--add-button-hover-color);
+  }
+}
+.table__button_add-row {
+  top: calc(100% + var(--cell-spacing));
+  left: calc(var(--cell-spacing) + var(--border-width));
+}
+.table__button_add-col {
+  left: calc(100% + var(--cell-spacing));
+  top: calc(var(--cell-spacing) + var(--border-width));
+}
+.table__button_del {
+  background-color: var(--del-button-color);
+  display: none;
+  &:hover {
+    background-color: var(--del-button-hover-color);
+  }
+}
+.table__button_del-row {
+  right: calc(100% + var(--cell-spacing));
+}
+.table__button_del-col {
+  bottom: calc(100% + var(--cell-spacing));
+}
+.show {
+  display: block;
+}
