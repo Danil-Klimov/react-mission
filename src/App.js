@@ -32,18 +32,19 @@ class App extends Component {
       },
     ],
     showDelButtons: false,
-    setId: () => Math.random().toString(16)
+    id: 1
   };
 
   componentWillMount() {
     const initialTable = Array(this.props.initialHeight).fill({ row: Array(this.props.initialWidth).fill({ cellText: "" }) });
+    let newId = this.state.id;
     const newTable = initialTable.map((item) => {
       const row = item.row.map((item) => {
-        return {...item, id: this.state.setId()}
+        return {...item, id: newId++}
       })
-      return { row, id: this.state.setId()}
+      return { row, id: newId++}
     })
-    this.setState({table: newTable});
+    this.setState({table: newTable, id: newId});
   };
 
   createButtons = () => {
@@ -124,20 +125,23 @@ class App extends Component {
 
   addRow = () => {
     const rowCopy = this.state.table[this.state.table.length - 1];
+    let newId = this.state.id;
     const row = rowCopy.row.map((item) => {
-      return { ...item, id: this.state.setId() }
+      newId++
+      return { ...item, id: newId }
     })
-    const newTable = [...this.state.table, {row, id: this.state.setId()}];
-    this.setState({ table: newTable });
+    const newTable = [...this.state.table, {row, id: newId++}];
+    this.setState({ table: newTable, id: newId });
   };
 
   addCol = () => {
     const newTable = this.state.table;
+    let newId = this.state.id;
     newTable.map((item) => {
       const newCell = { ...item.row[item.row.length - 1] }
-      newCell.id = this.state.setId();
+      newCell.id = newId++;
       item.row = [...item.row, newCell];
-      return this.setState({table: newTable})
+      return this.setState({table: newTable, id: newId})
     });
   };
 
