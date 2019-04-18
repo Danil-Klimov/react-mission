@@ -1,16 +1,11 @@
-// import React from 'react';
-// import ReactDOM from 'react-dom';
-// import App from './App';
+import React from 'react';
+import { shallow, mount, render } from 'enzyme';
+import App from './App';
+import Table from './components/Table';
 
-// it('renders without crashing', () => {
-//   const div = document.createElement('div');
-//   ReactDOM.render(<App />, div);
-//   ReactDOM.unmountComponentAtNode(div);
-// });
-
-
-describe('tests', () => {
+describe('App', () => {
   it('add row', () => {
-    expect(addRow()).toEqual(3)
+    const wrapper = mount(<App />)
+    expect(wrapper.state()).toEqual(1)
   })
-});
+})
