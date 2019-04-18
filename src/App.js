@@ -50,7 +50,7 @@ class App extends Component {
   createButtons = () => {
     return this.state.buttons.map((item, index) => {
       return <Button key={index}
-        className={"showClass" in item && this.state.showDelButtons ? `${item.className} ${item.showClass}` : `${item.className}`}
+        className={"showClass" in item && item.show ? `${item.className} ${item.showClass}` : `${item.className}`}
         text={item.text}
         style={Object.assign({ width: this.props.cellSize + "px", height: this.props.cellSize + "px" }, item.position)} />
 
@@ -75,9 +75,7 @@ class App extends Component {
   };
 
   handleTableMouseEnter = () => {
-    if (!this.state.showDelButtons) {
-      this.showDelButtons();
-    }
+    this.showDelButtons(true);
   };
 
   handleContainerMouseEnter = () => {
@@ -85,11 +83,9 @@ class App extends Component {
   };
 
   handleContainerMouseLeave = () => {
-    if (this.state.showDelButtons) {
-      this.timer = setTimeout(() => {
-        this.showDelButtons();
-      }, 100);
-    }
+    this.timer = setTimeout(() => {
+      this.showDelButtons(false);
+    }, 100);
   };
 
   handleTableMouseOver = ({ target }) => {
@@ -98,8 +94,18 @@ class App extends Component {
     }
   };
 
-  showDelButtons = () => {
-    this.setState({ showDelButtons: !this.state.showDelButtons });
+  showDelButtons = (show) => {
+    const buttons = this.state.buttons;
+    const newButtons = buttons.map((item) => {
+      if("show" in item) {
+        if (("top" in item.position && this.state.table.length > 1 && show) || ("left" in item.position && this.state.table[0].row.length > 1 && show)) {
+          return { ...item, show: true}
+        }
+        return { ...item, show: false }
+      }
+      return item
+    });
+    this.setState({ buttons: newButtons });
   };
 
   moveDelButtons = (target) => {
