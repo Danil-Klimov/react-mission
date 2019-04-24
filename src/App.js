@@ -121,12 +121,13 @@ class App extends Component {
           buttons[index].position = { left: targetLeftPosition - this.tableContainer.offsetLeft + window.pageXOffset + "px" };
         }
       }
-      return this.setState({
-        buttons,
-        colIndex: target.cellIndex,
-        rowIndex: target.closest("tr").rowIndex
-      })
+      return buttons
     });
+    this.setState({
+      buttons,
+      colIndex: target.cellIndex,
+      rowIndex: target.closest("tr").rowIndex
+    })
   };
 
   addRow = () => {
@@ -147,8 +148,9 @@ class App extends Component {
       const newCell = { ...item.row[item.row.length - 1] }
       newCell.id = newId++;
       item.row = [...item.row, newCell];
-      return this.setState({table: newTable, id: newId})
+      return newTable;
     });
+    this.setState({ table: newTable, id: newId });
   };
 
   delRow = () => {
@@ -163,8 +165,9 @@ class App extends Component {
     const newTable = this.state.table;
     newTable.map((item) => {
       item.row.splice(this.state.colIndex, 1);
-      return this.setState({table: newTable})
-    })
+      return newTable
+    });
+    this.setState({ table: newTable });
   };
 
   render() {
