@@ -1,14 +1,10 @@
-import React, { Component } from 'react';
+import React from 'react';
 
-class Button extends Component {
-  render() {
+export default function(props) {
     return (
-      <button className={this.props.className}
-        style={this.props.style}>
-        {this.props.text}
+      <button className={`table__button ${props.className}`}
+        style={props.style}>
+        {props.text}
       </button>
     );
-  }
-}
-
-export default Button;
+};

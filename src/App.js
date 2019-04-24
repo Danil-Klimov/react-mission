@@ -7,31 +7,14 @@ class App extends Component {
   state = {
     colIndex: null,
     rowIndex: null,
-    buttons: [
-      {
-        className: "table__button table__button_add table__button_add-row",
-        text: "+"
-      },
-      {
-        className: "table__button table__button_add table__button_add-col",
-        text: "+"
-      },
-      {
-        className: "table__button table__button_del table__button_del-row",
-        showClass: "show",
-        show: false,
-        text: "–",
-        position: { top: 3 + "px" }
-      },
-      {
-        className: "table__button table__button_del table__button_del-col",
-        showClass: "show",
-        show: false,
-        text: "–",
-        position: { left: 3 + "px" }
-      },
-    ],
-    showDelButtons: false,
+    delRowButton: {
+      show: false,
+      position: "3px"
+    },
+    delColButton: {
+      show: false,
+      position: "3px"
+    },
     id: 1
   };
 
@@ -45,16 +28,6 @@ class App extends Component {
       return { row, id: newId++}
     })
     this.setState({table: newTable, id: newId});
-  };
-
-  createButtons = () => {
-    return this.state.buttons.map((item, index) => {
-      return <Button key={index}
-        className={"showClass" in item && item.show ? `${item.className} ${item.showClass}` : `${item.className}`}
-        text={item.text}
-        style={Object.assign({ width: this.props.cellSize + "px", height: this.props.cellSize + "px" }, item.position)} />
-
-    })
   };
 
   handleClick = ({ target }) => {
@@ -95,36 +68,26 @@ class App extends Component {
   };
 
   showDelButtons = (show) => {
-    const buttons = this.state.buttons;
-    const newButtons = buttons.map((item) => {
-      if("show" in item) {
-        if (("top" in item.position && this.state.table.length > 1 && show) || ("left" in item.position && this.state.table[0].row.length > 1 && show)) {
-          return { ...item, show: true}
-        }
-        return { ...item, show: false }
-      }
-      return item
-    });
-    this.setState({ buttons: newButtons });
+    const delRowButton = this.state.delRowButton;
+    const delColButton = this.state.delColButton;
+    let newDelRowButton;
+    let newDelColButton;
+    this.state.table.length > 1 && show ? newDelRowButton = { ...delRowButton, show: true } : newDelRowButton = { ...delRowButton, show: false };
+    this.state.table[0].row.length > 1 && show ? newDelColButton = { ...delColButton, show: true } : newDelColButton = { ...delColButton, show: false };
+    this.setState({
+      delRowButton: newDelRowButton,
+      delColButton: newDelColButton
+    })
   };
 
   moveDelButtons = (target) => {
     const targetLeftPosition = target.getBoundingClientRect().left;
     const targetTopPosition = target.getBoundingClientRect().top;
-    const buttons = this.state.buttons;
-    buttons.map((item, index) => {
-      if ("showClass" in item) {
-        if ("top" in item.position) {
-          buttons[index].position = { top: targetTopPosition - this.tableContainer.offsetTop + window.pageYOffset + "px" };
-        }
-        if ("left" in item.position) {
-          buttons[index].position = { left: targetLeftPosition - this.tableContainer.offsetLeft + window.pageXOffset + "px" };
-        }
-      }
-      return buttons
-    });
+    const delRowButton = this.state.delRowButton;
+    const delColButton = this.state.delColButton;
     this.setState({
-      buttons,
+      delRowButton: { ...delRowButton, position: targetTopPosition - this.tableContainer.offsetTop + window.pageYOffset + "px"},
+      delColButton: { ...delColButton, position: targetLeftPosition - this.tableContainer.offsetLeft + window.pageXOffset + "px"},
       colIndex: target.cellIndex,
       rowIndex: target.closest("tr").rowIndex
     })
@@ -181,7 +144,18 @@ class App extends Component {
           size={this.props.cellSize}
           onMouseEnter={this.handleTableMouseEnter}
           onMouseOver={this.handleTableMouseOver} />
-        {this.createButtons()}
+        <Button className={"table__button_add table__button_add-row"}
+                text={"+"}
+                style={{ width: this.props.cellSize + "px", height: this.props.cellSize + "px"}}/>
+        <Button className={"table__button_add table__button_add-col"}
+                text={"+"}
+                style={{ width: this.props.cellSize + "px", height: this.props.cellSize + "px" }}/>
+        <Button className={!this.state.delRowButton.show ? "table__button_del table__button_del-row" : "table__button_del table__button_del-row show"}
+                text={"-"}
+                style={{ width: this.props.cellSize + "px", height: this.props.cellSize + "px", top: this.state.delRowButton.position }}/>
+        <Button className={!this.state.delColButton.show ? "table__button_del table__button_del-col" : "table__button_del table__button_del-col show"}
+                text={"-"}
+                style={{ width: this.props.cellSize + "px", height: this.props.cellSize + "px", left: this.state.delColButton.position }}/>
       </div>
     );
   }
