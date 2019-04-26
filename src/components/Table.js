@@ -1,14 +1,12 @@
 import React, { Component } from 'react';
 
 class Table extends Component {
-  state = {
-    createTable: () => {
-      return this.props.table.map((item) => {
-        return <tr key={item.id}>{item.row.map((item) => {
-          return <td key={item.id} style={{ width: this.props.size + 'px', height: this.props.size + 'px' }}>{item.cellText}</td>
-        })}</tr>
-      })
-    }
+  createTable = () => {
+    return this.props.rows.rowsArray.map((item) => {
+      return <tr key={item}>{this.props.cells.cellsArray.map((item) => {
+        return <td key={item} style={{ width: this.props.size + 'px', height: this.props.size + 'px' }}></td>
+      })}</tr>
+    })
   }
 
   render() {
@@ -17,7 +15,7 @@ class Table extends Component {
         onMouseEnter={this.props.onMouseEnter}
         onMouseOver={this.props.onMouseOver}>
         <tbody>
-          {this.state.createTable()}
+          {this.createTable()}
         </tbody>
       </table>
     );

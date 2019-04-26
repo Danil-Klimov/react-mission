@@ -1,10 +1,12 @@
 import React from 'react';
 
-export default function(props) {
+const Button = (props) => {
     return (
       <button className={`table__button ${props.className}`}
-        style={props.style}>
+        style={props.style}
+        onClick={props.onClick}>
         {props.text}
       </button>
     );
 };
+export default Button;

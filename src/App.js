@@ -4,6 +4,29 @@ import Table from "./components/Table";
 import Button from "./components/Button"
 
 class App extends Component {
+  static defaultProps = {
+    initialWidth: 4,
+    initialHeight: 4,
+    cellSize: 50
+  };
+  constructor(props) {
+    super(props);
+    let rowId = this.state.rows.id;
+    const initialRows = Array(this.props.initialHeight).fill('');
+    const rows = initialRows.map((row) => {
+      return row = rowId++;
+    });
+    let cellId = this.state.cells.id;
+    const initialCells = Array(this.props.initialWidth).fill('');
+    const cells = initialCells.map((cell) => {
+      return cell = cellId++;
+    });
+    this.state = {
+      ...this.state,
+      cells: { cellsArray: cells, id: cellId },
+      rows: { rowsArray: rows, id: rowId }
+    }
+  }
   state = {
     colIndex: null,
     rowIndex: null,
@@ -15,35 +38,13 @@ class App extends Component {
       show: false,
       position: "3px"
     },
-    id: 1
-  };
-
-  componentWillMount() {
-    const initialTable = Array(this.props.initialHeight).fill({ row: Array(this.props.initialWidth).fill({ cellText: "" }) });
-    let newId = this.state.id;
-    const newTable = initialTable.map((item) => {
-      const row = item.row.map((item) => {
-        return {...item, id: newId++}
-      })
-      return { row, id: newId++}
-    })
-    this.setState({table: newTable, id: newId});
-  };
-
-  handleClick = ({ target }) => {
-    if (target.classList.contains("table__button_add-row")) {
-      this.addRow();
-    }
-    if (target.classList.contains("table__button_add-col")) {
-      this.addCol();
-    }
-    if (target.classList.contains("table__button_del-row")) {
-      this.delRow();
-      this.showDelButtons();
-    }
-    if (target.classList.contains("table__button_del-col")) {
-      this.delCol();
-      this.showDelButtons();
+    rows: {
+      rowsArray: [],
+      id: 0
+    },
+    cells: {
+      cellsArray: [],
+      id: 0
     }
   };
 
@@ -63,7 +64,14 @@ class App extends Component {
 
   handleTableMouseOver = ({ target }) => {
     if (target.tagName === "TD") {
-      this.moveDelButtons(target);
+      const delRowButton = this.state.delRowButton;
+      const delColButton = this.state.delColButton;
+      this.setState({
+        delRowButton: { ...delRowButton, position: target.offsetTop },
+        delColButton: { ...delColButton, position: target.offsetLeft },
+        colIndex: target.cellIndex,
+        rowIndex: target.closest("tr").rowIndex
+      })
     }
   };
 
@@ -72,90 +80,73 @@ class App extends Component {
     const delColButton = this.state.delColButton;
     let newDelRowButton;
     let newDelColButton;
-    this.state.table.length > 1 && show ? newDelRowButton = { ...delRowButton, show: true } : newDelRowButton = { ...delRowButton, show: false };
-    this.state.table[0].row.length > 1 && show ? newDelColButton = { ...delColButton, show: true } : newDelColButton = { ...delColButton, show: false };
+    this.state.rows.rowsArray.length > 1 && show ? newDelRowButton = { ...delRowButton, show: true } : newDelRowButton = { ...delRowButton, show: false };
+    this.state.cells.cellsArray.length > 1 && show ? newDelColButton = { ...delColButton, show: true } : newDelColButton = { ...delColButton, show: false };
     this.setState({
       delRowButton: newDelRowButton,
       delColButton: newDelColButton
     })
   };
 
-  moveDelButtons = (target) => {
-    const targetLeftPosition = target.getBoundingClientRect().left;
-    const targetTopPosition = target.getBoundingClientRect().top;
-    const delRowButton = this.state.delRowButton;
-    const delColButton = this.state.delColButton;
-    this.setState({
-      delRowButton: { ...delRowButton, position: targetTopPosition - this.tableContainer.offsetTop + window.pageYOffset + "px"},
-      delColButton: { ...delColButton, position: targetLeftPosition - this.tableContainer.offsetLeft + window.pageXOffset + "px"},
-      colIndex: target.cellIndex,
-      rowIndex: target.closest("tr").rowIndex
-    })
-  };
-
   addRow = () => {
-    const rowCopy = this.state.table[this.state.table.length - 1];
-    let newId = this.state.id;
-    const row = rowCopy.row.map((item) => {
-      newId++
-      return { ...item, id: newId }
-    })
-    const newTable = [...this.state.table, {row, id: newId++}];
-    this.setState({ table: newTable, id: newId });
+    const rowsCopy = this.state.rows.rowsArray;
+    let rowId = this.state.rows.id;
+    const newRows = [...rowsCopy, rowId++]
+    this.setState({ rows: { rowsArray: newRows, id: rowId }})
   };
 
   addCol = () => {
-    const newTable = this.state.table;
-    let newId = this.state.id;
-    newTable.map((item) => {
-      const newCell = { ...item.row[item.row.length - 1] }
-      newCell.id = newId++;
-      item.row = [...item.row, newCell];
-      return newTable;
-    });
-    this.setState({ table: newTable, id: newId });
+    const cellsCopy = this.state.cells.cellsArray;
+    let cellId = this.state.cells.id;
+    const newCells = [...cellsCopy, cellId++]
+    this.setState({ cells: { cellsArray: newCells, id: cellId } })
   };
 
   delRow = () => {
     this.setState(() => {
-      const newTable = this.state.table;
-      newTable.splice(this.state.rowIndex, 1);
-      return { table: newTable }
-    })
+      const newRows = this.state.rows;
+      newRows.rowsArray.splice(this.state.rowIndex, 1);
+      return { rows: newRows }
+    });
+    this.showDelButtons();
   };
 
   delCol = () => {
-    const newTable = this.state.table;
-    newTable.map((item) => {
-      item.row.splice(this.state.colIndex, 1);
-      return newTable
+    this.setState(() => {
+      const newCells = this.state.cells;
+      newCells.cellsArray.splice(this.state.colIndex, 1);
+      return { cells: newCells }
     });
-    this.setState({ table: newTable });
+    this.showDelButtons();
   };
 
   render() {
     return (
       <div className="table-container"
-        onClick={this.handleClick}
         onMouseEnter={this.handleContainerMouseEnter}
-        onMouseLeave={this.handleContainerMouseLeave}
-        ref={(node => { this.tableContainer = node })}>
-        <Table table={this.state.table}
-          size={this.props.cellSize}
-          onMouseEnter={this.handleTableMouseEnter}
-          onMouseOver={this.handleTableMouseOver} />
+        onMouseLeave={this.handleContainerMouseLeave}>
+        <Table rows={this.state.rows}
+                cells={this.state.cells}
+                table={this.state.table}
+                size={this.props.cellSize}
+                onMouseEnter={this.handleTableMouseEnter}
+                onMouseOver={this.handleTableMouseOver} />
         <Button className={"table__button_add table__button_add-row"}
                 text={"+"}
-                style={{ width: this.props.cellSize + "px", height: this.props.cellSize + "px"}}/>
+                style={{ width: this.props.cellSize + "px", height: this.props.cellSize + "px"}}
+                onClick={this.addRow}/>
         <Button className={"table__button_add table__button_add-col"}
                 text={"+"}
-                style={{ width: this.props.cellSize + "px", height: this.props.cellSize + "px" }}/>
+                style={{ width: this.props.cellSize + "px", height: this.props.cellSize + "px" }}
+                onClick={this.addCol}/>
         <Button className={!this.state.delRowButton.show ? "table__button_del table__button_del-row" : "table__button_del table__button_del-row show"}
                 text={"-"}
-                style={{ width: this.props.cellSize + "px", height: this.props.cellSize + "px", top: this.state.delRowButton.position }}/>
+                style={{ width: this.props.cellSize + "px", height: this.props.cellSize + "px", top: this.state.delRowButton.position }}
+                onClick={this.delRow}/>
         <Button className={!this.state.delColButton.show ? "table__button_del table__button_del-col" : "table__button_del table__button_del-col show"}
                 text={"-"}
-                style={{ width: this.props.cellSize + "px", height: this.props.cellSize + "px", left: this.state.delColButton.position }}/>
+                style={{ width: this.props.cellSize + "px", height: this.props.cellSize + "px", left: this.state.delColButton.position }}
+                onClick={this.delCol}/>
       </div>
     );
   }
