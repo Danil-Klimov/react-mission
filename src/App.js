@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './App.scss';
 import Table from "./components/Table";
-import Button from "./components/Button"
+import Button from "./components/Button";
 
 class App extends Component {
   static defaultProps = {
@@ -48,9 +48,6 @@ class App extends Component {
     }
   };
 
-  handleTableMouseEnter = () => {
-    this.showDelButtons(true);
-  };
 
   handleContainerMouseEnter = () => {
     clearTimeout(this.timer)
@@ -60,6 +57,10 @@ class App extends Component {
     this.timer = setTimeout(() => {
       this.showDelButtons(false);
     }, 100);
+  };
+
+  handleTableMouseEnter = () => {
+    this.showDelButtons(true);
   };
 
   handleTableMouseOver = ({ target }) => {
@@ -92,7 +93,7 @@ class App extends Component {
     const rowsCopy = this.state.rows.rowsArray;
     let rowId = this.state.rows.id;
     const newRows = [...rowsCopy, rowId++]
-    this.setState({ rows: { rowsArray: newRows, id: rowId }})
+    this.setState({ rows: { rowsArray: newRows, id: rowId } })
   };
 
   addCol = () => {
